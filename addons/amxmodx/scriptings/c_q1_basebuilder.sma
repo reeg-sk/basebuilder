@@ -25,6 +25,7 @@ Hook pocas stavby +reload (R)
 Navrhy co pridat/odstranit:
 +?pridat config
 +?pridat multilang
++?pridat specialne zbrane (po padnuti kluca)
 
 -?rekurzia (xd)
 __________________________
@@ -50,6 +51,8 @@ ADMIN JE NASTAVENY NA ADMIN_BAN
 #define USER				"database username "
 #define PASS				"database password"
 #define DTBZ				"database name"
+
+#define START_POINTS		100
 
 #define PREFIX				"[BaseBuilder]" // Prefix pred spravami z ColorChatu
 
@@ -100,6 +103,9 @@ new CsTeams:g_pTeam[33], CsTeams:g_pCurTeam[33];
 
 new g_HudChannel_count, g_HudChannel_info, gHudSyncInfo, HudSync;
 
+new Handle:g_SqlTuple;
+new g_Error[512];
+
 /* TASKY */
 enum (+= 5000)
 {
@@ -139,9 +145,6 @@ const m_flNextAttack 			= 83;
 
 static gmsgBarTime2;
 static Ham:Ham_Player_ResetMaxSpeed = Ham_Item_PreFrame;
-
-new Handle:g_SqlTuple;
-new g_Error[512];
 
 /* VYLEPSENIA */
 enum _:UpgradeItems
@@ -650,6 +653,7 @@ public plugin_precache() {
 	precache_sound(g_UpgradeMenuBuy);
 	precache_sound(g_MenuUnlock);
 	precache_sound(g_MarketBuy);
+	precache_sound(g_ZombKill);
 	precache_sound(g_DropItem);
 
 	precache_sound(g_PhaseBuild);
@@ -747,7 +751,7 @@ public register_client(FailState,Handle:Query,Error[],Errcode,Data[],DataSize)
 			return PLUGIN_HANDLED;
    
 		new szTemp[512];
-		format(szTemp,charsmax(szTemp),"INSERT INTO `basebuilder_save` (`steamid`, `body`, `exp`, `farba`, `item_zatmenie`, `item_kluc`, `item_aurora`, `vylepsenia_zm`, `vylepsenia_hm`, `vylepsenia_all`, `zbrane_primary`, `zbrane_pistole`) VALUES ('%s','0', '0', '0', '0', '0', '0', '0#0#0#0#0', '0#0#0#0', '0#0', '0#0#0#0#0#1#0#0#0#0#0#0', '0#1#0#0#0');", szSteamId);
+		format(szTemp,charsmax(szTemp),"INSERT INTO `basebuilder_save` (`steamid`, `body`, `exp`, `farba`, `item_zatmenie`, `item_kluc`, `item_aurora`, `vylepsenia_zm`, `vylepsenia_hm`, `vylepsenia_all`, `zbrane_primary`, `zbrane_pistole`) VALUES ('%s','%d', '0', '0', '0', '0', '0', '0#0#0#0#0', '0#0#0#0', '0#0', '0#0#0#0#0#1#0#0#0#0#0#0', '0#1#0#0#0');", szSteamId, START_POINTS);
 		SQL_ThreadQuery(g_SqlTuple,"IgnoreHandle",szTemp);
     } else {
 		p_Body[id] = SQL_ReadResult(Query, 1);
@@ -2075,7 +2079,7 @@ public MarketVylepsenia(id) {
 	new menu = menu_create("Cierny trh^n\rVylepsenia", "MarketVylepseniaMenu_handle");
 
 	for(new i = 0; i < sizeof(MarketUpgrades); i++) {
-        	formatex(szItemTitle, charsmax(szItemTitle), (g_iMarketUpgrades[i][id]) ? "\w%s ^n\d- %s ^n\wCena: \y-ZAKUPENE-^n" : "\w%s ^n\d- %s ^n\wCena: \r%i bodov^n", MarketUpgrades[i][MarketName], MarketUpgrades[i][MarketDescription], MarketUpgrades[i][MarketCost]);        
+        formatex(szItemTitle, charsmax(szItemTitle), (g_iMarketUpgrades[i][id]) ? "\w%s ^n\d- %s ^n\wCena: \y-ZAKUPENE-^n" : "\w%s ^n\d- %s ^n\wCena: \r%i bodov^n", MarketUpgrades[i][MarketName], MarketUpgrades[i][MarketDescription], MarketUpgrades[i][MarketCost]);        
 			
 		if(g_iMarketUpgrades[i][id] || p_Body[id] <= MarketUpgrades[i][WeaponCost]) {
 			iAccess = 1<<31;
