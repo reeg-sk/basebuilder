@@ -22,6 +22,7 @@ public bbAmenu(id) {
 	menu_additem(menu, "Pridat body");
 	menu_additem(menu, "Pridat XP");
 	menu_additem(menu, "Vybrat item");
+	menu_additem(menu, "Odobrat item");
 
 	// co vam chyba si uz musite pridat
 
@@ -38,6 +39,7 @@ public bbAmenu_handle(id, menu, item) {
         	case 0: MenuChosen[id] = 1;
         	case 1: MenuChosen[id] = 2;
         	case 2: MenuChosen[id] = 3;
+			case 3: MenuChosen[id] = 4;
     	}
 
         PlayersMenu(id);
@@ -53,6 +55,7 @@ public PlayersMenu(id) {
 		case 1: formatex(szMenuTitle, charsmax(szMenuTitle), "\rPridat body^n\yVyber hraca \d");
 		case 2: formatex(szMenuTitle, charsmax(szMenuTitle), "\rPridat XP \w(%d)^n\yVyber hraca \d", fm_max_user_level());
  		case 3: formatex(szMenuTitle, charsmax(szMenuTitle), "\rVybrat item \w(0-2)^n\yVyber hraca \d");
+		case 4: formatex(szMenuTitle, charsmax(szMenuTitle), "\rOdobrat item \w(0-2)^n\yVyber hraca \d");
 	}
 
 	new menu = menu_create(szMenuTitle, "PlayersMenu_handle");
@@ -123,6 +126,7 @@ public call_native(id, args[]) {
         	case 1: if(parseNum <= 10000000) fm_set_user_body(PlayerChosen[id], parseNum);
         	case 2: if(parseNum <= 25000) fm_set_user_xp(PlayerChosen[id], parseNum);
         	case 3: if(parseNum < 3 && parseNum >= 0) fm_set_user_item(PlayerChosen[id], parseNum);
+			case 4: if(parseNum < 3 && parseNum >= 0) fm_rem_user_item(PlayerChosen[id], parseNum);
 	}
 	return PLUGIN_HANDLED;
 }

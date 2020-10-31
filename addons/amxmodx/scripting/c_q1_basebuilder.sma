@@ -697,6 +697,7 @@ public plugin_natives()
 	register_native("fm_max_user_level", "_fm_max_user_level", 1);
 
 	register_native( "fm_set_user_item", "_fm_set_user_item", 1);
+	register_native( "fm_rem_user_item", "_fm_rem_user_item", 1);
 }
 
 public _fm_get_user_body(id) return p_Body[id];
@@ -713,6 +714,8 @@ public _fm_set_user_xp(id, xp) {
 public _fm_max_user_level() return MaxLevels;
 
 public _fm_set_user_item(id, item) g_iDropItems[item][id] = 1;
+
+public _fm_rem_user_item(id, item) g_iDropItems[item][id] = 0;
 
 /* MYSQL UKLADANIE */
 public MySql_Init()

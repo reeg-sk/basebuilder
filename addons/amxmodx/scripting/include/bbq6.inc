@@ -14,3 +14,5 @@ native fm_set_user_xp(id, xp);
 native fm_max_user_level();
 
 native fm_set_user_item(id, item);
+
+native fm_rem_user_item(id, item);
