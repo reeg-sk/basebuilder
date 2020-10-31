@@ -39,6 +39,7 @@ __________________________
 #include <xs>
 #include <dhudmessage>
 #include <sqlx>
+#include <bbq6>
 
 /**
 PREMIUM JE NASTAVENE NA ADMIN_LEVEL_H
@@ -48,11 +49,11 @@ ADMIN JE NASTAVENY NA ADMIN_BAN
 /* DEFINICIE - UPRAVIT PODLA POTREBY */
 // nezabudni zmenit!
 #define HOST				"database host"
-#define USER				"database username "
+#define USER				"database username"
 #define PASS				"database password"
 #define DTBZ				"database name"
 
-#define START_POINTS		100
+#define START_POINTS			100 // body, ktore dostane novy hrac (prve pripojenie)
 
 #define PREFIX				"[BaseBuilder]" // Prefix pred spravami z ColorChatu
 
@@ -684,6 +685,34 @@ public plugin_precache() {
 	DispatchKeyValue(i, "bombradius", "1");
 	DispatchSpawn(i);
 }
+
+/* NATIVES - INCLUDE */
+public plugin_natives()
+{
+	register_native("fm_get_user_body", "_fm_get_user_body", 1);
+	register_native("fm_set_user_body", "_fm_set_user_body", 1);
+
+	register_native("fm_get_user_level", "_fm_get_user_level", 1);
+	register_native("fm_set_user_xp", "_fm_set_user_xp", 1);
+	register_native("fm_max_user_level", "_fm_max_user_level", 1);
+
+	register_native( "fm_set_user_item", "_fm_set_user_item", 1);
+}
+
+public _fm_get_user_body(id) return p_Body[id];
+
+public _fm_set_user_body(id, points) p_Body[id] = points;
+
+public _fm_get_user_level(id) return Level[id];
+
+public _fm_set_user_xp(id, xp) {
+	p_XP[id] += xp;
+	CheckLevel(id);
+}
+
+public _fm_max_user_level() return MaxLevels;
+
+public _fm_set_user_item(id, item) g_iDropItems[item][id] = 1;
 
 /* MYSQL UKLADANIE */
 public MySql_Init()
@@ -2079,7 +2108,7 @@ public MarketVylepsenia(id) {
 	new menu = menu_create("Cierny trh^n\rVylepsenia", "MarketVylepseniaMenu_handle");
 
 	for(new i = 0; i < sizeof(MarketUpgrades); i++) {
-        formatex(szItemTitle, charsmax(szItemTitle), (g_iMarketUpgrades[i][id]) ? "\w%s ^n\d- %s ^n\wCena: \y-ZAKUPENE-^n" : "\w%s ^n\d- %s ^n\wCena: \r%i bodov^n", MarketUpgrades[i][MarketName], MarketUpgrades[i][MarketDescription], MarketUpgrades[i][MarketCost]);        
+		formatex(szItemTitle, charsmax(szItemTitle), (g_iMarketUpgrades[i][id]) ? "\w%s ^n\d- %s ^n\wCena: \y-ZAKUPENE-^n" : "\w%s ^n\d- %s ^n\wCena: \r%i bodov^n", MarketUpgrades[i][MarketName], MarketUpgrades[i][MarketDescription], MarketUpgrades[i][MarketCost]);        
 			
 		if(g_iMarketUpgrades[i][id] || p_Body[id] <= MarketUpgrades[i][WeaponCost]) {
 			iAccess = 1<<31;
